@@ -1,4 +1,5 @@
-import express from 'express';
+import express,{ Request, Response }  from 'express';
+
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -28,16 +29,23 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //   the filtered image file [!!TIP res.sendFile(filteredpath); might be useful]
 
   /**************************************************************************** */
-  app.get("/filteredimage", async (req, res) => {
+
+
+  app.get("/filteredimage", async (req: Request, res: Response) => {
     
-    const {image_url} = req.query;
-    
+   const {image_url} = req.query;
+
+   
+    //const {image_url} = req.query;
+
     if(!image_url) {
       return res.status(400).json({"Please provide a valid image url": false});
     }
     try {
-      let imageFile = await filterImageFromURL(image_url);
-     // console.log(imageFile);
+      
+      let imageFile = await filterImageFromURL(String(image_url));
+     // let imageFile = await filterImageFromURL(image_url);
+     console.log(imageFile);
 
       return res.status(200).sendFile(imageFile, () => {
         deleteLocalFiles([imageFile]);
@@ -45,7 +53,9 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
     } 
     catch (err) {
+      //console.log(err);
       return res.status(422).send("Not able to download this file.");
+
     }
 
   });
